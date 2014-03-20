@@ -1,0 +1,34 @@
+<html>
+<head>
+  <title>Slow Page</title>
+  <script>
+  var creatediv = function() {
+    window.setTimeout(function() {
+      var body = document.querySelector('body');
+      body.insertAdjacentHTML('beforeend', '<div id="inserted">I was inserted!</div>');
+    }, 3000);
+  };
+
+  var showmessage = function() {
+    window.setTimeout(function() {
+      var message = document.getElementById('message');
+      message.setAttribute('style', 'display:block');
+    }, 3000);
+  }
+
+  var hidemessage = function() {
+    window.setTimeout(function() {
+      var message = document.getElementById('message');
+      message.setAttribute('style', 'display:none');
+    }, 3000);
+  }
+  </script>
+</head>
+<body>
+  <h1>A bunch of slow buttons</h1>
+  <button id="creatediv" onclick="creatediv()">Create Div</button>
+  <button id="showmessage" onclick="showmessage()">Show Message</button>
+  <button id="hidemessage" onclick="hidemessage()">Hide Message</button>
+  <div id="message" style="display:none">I am the message!</div>
+</body>
+</html>

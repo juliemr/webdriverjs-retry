@@ -1,0 +1,25 @@
+{
+  "name": "webdriverjs-retry",
+  "description": "Retry helper for WebDriverJS",
+  "homepage": "https://github.com/juliemr/webdriverjs-retry",
+  "keywords": [
+    "test",
+    "testing",
+    "webdriver",
+    "webdriverjs",
+    "selenium"
+  ],
+  "author": "Julie Ralph <ju.ralph@gmail.com>",
+  "dependencies": {
+    "selenium-webdriver": "2.40.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/juliemr/webdriverjs-retry.git"
+  },
+  "scripts": {
+    "test": "example_test.js"
+  },
+  "license": "MIT",
+  "version": "0.1.0"
+}
