@@ -18,6 +18,7 @@ Interface
  * @param timeout The total time to wait for this test to pass. If the timeout
  *     is exceeded and the code is erroring, throw that error.
  * @param opt_sleep Time to sleep between retries. Defaults to 100ms.
+ */
 retry(fn, timeout, opt_sleep)
 ```
 
