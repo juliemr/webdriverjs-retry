@@ -3,17 +3,26 @@ var util = require('util'),
     chrome = require('selenium-webdriver/chrome'),
     retry = require('./index.js');
 
-var service = new chrome.ServiceBuilder('./chromedriver').build();
 var driver = chrome.createDriver(
-        new webdriver.Capabilities({'browserName': 'chrome'}), service);
+    new webdriver.Capabilities({'browserName': 'chrome'}),
+    new chrome.ServiceBuilder('./chromedriver').build());
 
 driver.get('localhost:8888');
 
 retry(function() {
+  // Note that everything in here will be retried - including the
+  // first click.
   driver.findElement(webdriver.By.id('showmessage')).click();
   // This would throw an error without waiting because the message
   // is hidden for 3 seconds.
   driver.findElement(webdriver.By.id('message')).click();
-});
+}, 5000);
+
+retry(function() {
+  driver.findElement(webdriver.By.id('creatediv')).click();
+  // This would throw an error because the div does not appear for
+  // 3 seconds.
+  driver.findElement(webdriver.By.id('inserted')).getText();
+}, 5000);
 
 driver.quit();
