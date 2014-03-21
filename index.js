@@ -17,7 +17,7 @@ module.exports = function() {
      * @param {function} fn The function to execute. The entire contents of the
      *     function will be retried.
      * @param {number=} opt_timeout The total time to wait for this test to pass. If the
-     *     to,epit is exceeded and the code is erroring, throw that error.
+     *     timeout is exceeded and the code is erroring, throw that error.
      * @param {number=} opt_sleep Time to sleep between retries. Defaults to 100ms.
      * @return {webdriver.promise.Promise} a promise which will resolve when
      *     the retry is complete, or reject if the retry times out or encounters
