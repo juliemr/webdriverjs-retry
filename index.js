@@ -1,33 +1,103 @@
 var webdriver = require('selenium-webdriver');
 
+var DEFAULT_TIMEOUT = 3000;
 var DEFAULT_SLEEP = 100;
 
 // TODO - the timeout is not exactly accurate, since there's a lot of time
 // in between sleeps.
 
-// TODO - allow setting of default sleep and timeout.
-
-// TODO - allow only capturing certain type of errors.
-
 // TODO - should return something intelligent
 
-module.exports = function(fn, timeout, opt_sleep) {
-  var sleep = opt_sleep || DEFAULT_SLEEP;
+module.exports = function() {
+  var defaultTimeout = DEFAULT_TIMEOUT;
+  var defaultSleep = DEFAULT_SLEEP;
+  var errorsToIgnore = [];
   var flow = webdriver.promise.controlFlow();
-  var timeRemaining = timeout;
 
-  function tryExecute() {
-    flow.execute(fn).then(function() {
+  var retry = {
+    /**
+     * @param fn The function to execute. The entire contents of the function
+     *     will be retried.
+     * @param opt_timeout The total time to wait for this test to pass. If the
+     *     to,epit is exceeded and the code is erroring, throw that error.
+     * @param opt_sleep Time to sleep between retries. Defaults to 100ms.
+     */
+    run: function(fn, opt_timeout, opt_sleep) {
+      var timeout = opt_timeout || defaultTimeout;
+      var sleep = opt_sleep || defaultSleep;
+      var timeRemaining = timeout;
 
-    }, function(error) {
-      if (timeRemaining <= 0) {
-        throw error;
+      function tryExecute() {
+        flow.execute(fn).then(function() {
+
+        }, function(error) {
+          if (timeRemaining <= 0) {
+            throw error;
+          }
+          var ignoring = false;
+          if (errorsToIgnore.length) {
+            for (var i = 0; i < errorsToIgnore.length; i++) {
+              if (typeof errorsToIgnore[i] === 'number' &&
+                  errorsToIgnore[i] === error.code) {
+                ignoring = true;
+              } else {
+                if (error instanceof errorsToIgnore[i]) {
+                  ignoring = true;
+                }
+              }
+            }
+          } else {
+            ignoring = true;
+          }
+          if (!ignoring) {
+            throw error;
+          }
+          timeRemaining -= sleep;
+          flow.timeout(sleep);
+          tryExecute();
+        });
       }
-      timeRemaining -= sleep;
-      flow.timeout(sleep);
-      tryExecute();
-    });
-  }
 
-  tryExecute();
-};
+      tryExecute();
+    },
+    /**
+     * Set the default timeout for this retrier.
+     * @param {numer} timeout
+     */
+    setDefaultTimeout: function(timeout) {
+      defaultTimeout = timeout;
+      return retry;
+    },
+    /**
+     * Set the default sleep for this retrier.
+     * @param {numer} sleep
+     */
+    setDefaultSleep: function(sleep) {
+      defaultSleep = sleep;
+      return retry;
+    },
+    /**
+     * Set the errors to be ignored. By default, all errors are ignored.
+     * The arguments may be either error classes or numbers, which correspond
+     * to error codes.
+     *
+     * For a list of webdriver error codes, see
+     * https://code.google.com/p/selenium/source/browse/javascript/atoms/error.js
+     *
+     * @param {...(number|Object)} varArgs a list of error codes or error
+     *     classes to be ignored
+     */
+    ignoring: function(varArgs) {
+      var args = arguments;
+      flow.execute(function() {
+        errorsToIgnore = [];
+        for (var i = 0; i < args.length; ++i) {
+          errorsToIgnore.push(args[i]);
+        }
+      }, 'webdriverjs-retry setting error ignore list');
+      return retry;
+    }
+  };
+
+  return retry;
+}();

@@ -9,7 +9,7 @@ var driver = chrome.createDriver(
 
 driver.get('localhost:8888');
 
-retry(function() {
+retry.run(function() {
   // Note that everything in here will be retried - including the
   // first click.
   driver.findElement(webdriver.By.id('showmessage')).click();
@@ -18,7 +18,8 @@ retry(function() {
   driver.findElement(webdriver.By.id('message')).click();
 }, 5000);
 
-retry(function() {
+// 7 is the error code for element not found.
+retry.ignoring(7).run(function() {
   driver.findElement(webdriver.By.id('creatediv')).click();
   // This would throw an error because the div does not appear for
   // 3 seconds.

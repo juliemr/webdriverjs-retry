@@ -15,11 +15,11 @@ Interface
 /**
  * @param fn The function to execute. The entire contents of the function
  *     will be retried.
- * @param timeout The total time to wait for this test to pass. If the timeout
+ * @param opt_timeout The total time to wait for this test to pass. If the timeout
  *     is exceeded and the code is erroring, throw that error.
  * @param opt_sleep Time to sleep between retries. Defaults to 100ms.
  */
-retry(fn, timeout, opt_sleep)
+retry.run(fn, opt_timeout, opt_sleep)
 ```
 
 In your test
@@ -33,7 +33,7 @@ driver.get('localhost:8888');
 
 // Do some stuff with your driver.
 
-retry(function() {
+retry.run(function() {
   // Note that everything in here will be retried - including the
   // first click.
   driver.findElement(webdriver.By.id('showmessage')).click();
