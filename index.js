@@ -6,8 +6,6 @@ var DEFAULT_SLEEP = 100;
 // TODO - the timeout is not exactly accurate, since there's a lot of time
 // in between sleeps.
 
-// TODO - should return something intelligent
-
 module.exports = function() {
   var defaultTimeout = DEFAULT_TIMEOUT;
   var defaultSleep = DEFAULT_SLEEP;
@@ -16,11 +14,14 @@ module.exports = function() {
 
   var retry = {
     /**
-     * @param fn The function to execute. The entire contents of the function
-     *     will be retried.
-     * @param opt_timeout The total time to wait for this test to pass. If the
+     * @param {function} fn The function to execute. The entire contents of the
+     *     function will be retried.
+     * @param {number=} opt_timeout The total time to wait for this test to pass. If the
      *     to,epit is exceeded and the code is erroring, throw that error.
-     * @param opt_sleep Time to sleep between retries. Defaults to 100ms.
+     * @param {number=} opt_sleep Time to sleep between retries. Defaults to 100ms.
+     * @return {webdriver.promise.Promise} a promise which will resolve when
+     *     the retry is complete, or reject if the retry times out or encounters
+     *     an error which is not ignored.
      */
     run: function(fn, opt_timeout, opt_sleep) {
       var timeout = opt_timeout || defaultTimeout;
@@ -28,7 +29,7 @@ module.exports = function() {
       var timeRemaining = timeout;
 
       function tryExecute() {
-        flow.execute(fn).then(function() {
+        return flow.execute(fn).then(function() {
 
         }, function(error) {
           if (timeRemaining <= 0) {
@@ -58,7 +59,7 @@ module.exports = function() {
         });
       }
 
-      tryExecute();
+      return tryExecute();
     },
     /**
      * Set the default timeout for this retrier.

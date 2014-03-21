@@ -16,7 +16,11 @@ retry.run(function() {
   // This would throw an error without waiting because the message
   // is hidden for 3 seconds.
   driver.findElement(webdriver.By.id('message')).click();
-}, 5000);
+}, 5000).then(function() {
+  // run returns a promise which resolves when all the retrying is done
+  // If the retry fails (either it times out or the error is not in the ignore
+  // list) the promise will be rejected.
+});
 
 // 7 is the error code for element not found.
 retry.ignoring(7).run(function() {

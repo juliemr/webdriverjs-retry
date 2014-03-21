@@ -13,11 +13,14 @@ Install with `npm install webdriverjs-retry`
 Interface
 ```javascript
 /**
- * @param fn The function to execute. The entire contents of the function
- *     will be retried.
- * @param opt_timeout The total time to wait for this test to pass. If the timeout
- *     is exceeded and the code is erroring, throw that error.
- * @param opt_sleep Time to sleep between retries. Defaults to 100ms.
+ * @param {function} fn The function to execute. The entire contents of the
+ *     function will be retried.
+ * @param {number=} opt_timeout The total time to wait for this test to pass. If the
+ *     to,epit is exceeded and the code is erroring, throw that error.
+ * @param {number=} opt_sleep Time to sleep between retries. Defaults to 100ms.
+ * @return {webdriver.promise.Promise} a promise which will resolve when
+ *     the retry is complete, or reject if the retry times out or encounters
+ *     an error which is not ignored.
  */
 retry.run(fn, opt_timeout, opt_sleep)
 ```
