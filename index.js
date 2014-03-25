@@ -3,9 +3,6 @@ var webdriver = require('selenium-webdriver');
 var DEFAULT_TIMEOUT = 3000;
 var DEFAULT_SLEEP = 100;
 
-// TODO - the timeout is not exactly accurate, since there's a lot of time
-// in between sleeps.
-
 module.exports = function() {
   var defaultTimeout = DEFAULT_TIMEOUT;
   var defaultSleep = DEFAULT_SLEEP;
@@ -26,21 +23,32 @@ module.exports = function() {
     run: function(fn, opt_timeout, opt_sleep) {
       var timeout = opt_timeout || defaultTimeout;
       var sleep = opt_sleep || defaultSleep;
-      var timeRemaining = timeout;
+      var deadlineTimer = null;
+      var deadlineExceeded = false;
+
 
       function tryExecute() {
-        return flow.execute(fn).then(function() {
-
+        return flow.execute(function() {
+          if (!deadlineTimer) {
+            deadlineTimer = setTimeout(function() {
+              deadlineExceeded = true;
+            }, timeout);
+          }
+          return fn();
+        }).then(function(value) {
+          clearTimeout(deadlineTimer);
+          return value;
         }, function(error) {
-          if (timeRemaining <= 0) {
+          if (deadlineExceeded) {
             throw error;
           }
           var ignoring = false;
           if (errorsToIgnore.length) {
             for (var i = 0; i < errorsToIgnore.length; i++) {
-              if (typeof errorsToIgnore[i] === 'number' &&
-                  errorsToIgnore[i] === error.code) {
-                ignoring = true;
+              if (typeof errorsToIgnore[i] === 'number') {
+                if (errorsToIgnore[i] === error.code) {
+                  ignoring = true;
+                }
               } else {
                 if (error instanceof errorsToIgnore[i]) {
                   ignoring = true;
@@ -53,9 +61,8 @@ module.exports = function() {
           if (!ignoring) {
             throw error;
           }
-          timeRemaining -= sleep;
           flow.timeout(sleep);
-          tryExecute();
+          return tryExecute();
         });
       }
 

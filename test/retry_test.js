@@ -17,14 +17,6 @@ var getFakeDriver = function() {
     controlFlow: function() {
       return flow;
     },
-    sleep: function(ms) {
-      return flow.timeout(ms);
-    },
-    setUp: function() {
-      return flow.execute(function() {
-        return webdriver.promise.fulfilled('setup done');
-      });
-    },
     showElementSoon: function(ms) {
       return flow.execute(function() {
         setTimeout(function() {
@@ -36,7 +28,7 @@ var getFakeDriver = function() {
       return flow.execute(function() {
         return webdriver.promise.delayed(100).then(function() {
           if (elementExists) {
-            return webdriver.promise.fulfilled('a');
+            return webdriver.promise.fulfilled('e');
           } else {
             findTries++;
             var err = new Error('element not found');
@@ -60,8 +52,9 @@ describe('webdriverJS-retry', function() {
   it('should execute non-failing statements as usual', function(done) {
     var driver = getFakeDriver();
     retry.run(function() {
-      driver.getValueA();
+      return driver.getValueA();
     }).then(function(value) {
+      expect(value).toEqual('a');
       done();
     }, function(err) {
       done(err);
@@ -74,9 +67,10 @@ describe('webdriverJS-retry', function() {
     driver.showElementSoon(1000);
 
     retry.run(function() {
-      driver.findTheElement();
-    }, 2000).then(function() {
+      return driver.findTheElement();
+    }, 2000).then(function(value) {
       // Should have tried at least a couple times.
+      expect(value).toEqual('e');
       expect(driver.numFindTries()).toBeGreaterThan(2);
       done();
     }, function(err) {
@@ -124,6 +118,20 @@ describe('webdriverJS-retry', function() {
     retry.ignoring(1, 8).run(function() {
       driver.findTheElement();
     }, 2000).then(function() {
+      done();
+    }, function(err) {
+      done(err);
+    });
+  });
+
+  it('should clear the deadline timer', function(done) {
+    var driver = getFakeDriver();
+
+    driver.showElementSoon(1000);
+
+    retry.run(function() {
+      driver.findTheElement();
+    }, 200000).then(function() {
       done();
     }, function(err) {
       done(err);
