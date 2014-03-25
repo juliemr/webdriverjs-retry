@@ -13,12 +13,15 @@
   "peerDependencies": {
     "selenium-webdriver": "2.40.0"
   },
+  "devDependencies": {
+    "minijasminenode": "~0.2.7"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/juliemr/webdriverjs-retry.git"
   },
   "scripts": {
-    "test": "example_test.js"
+    "test": "./node_modules/.bin/minijasminenode test/*.js"
   },
   "license": "MIT",
   "version": "0.1.1"
