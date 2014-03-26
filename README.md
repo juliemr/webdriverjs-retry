@@ -11,7 +11,10 @@ Usage
 Install with `npm install webdriverjs-retry`
 
 Interface
+---------
 ```javascript
+var retry = require('webdriverjs-retry');
+
 /**
  * @param {function} fn The function to execute. The entire contents of the
  *     function will be retried.
@@ -23,9 +26,35 @@ Interface
  *     an error which is not ignored.
  */
 retry.run(fn, opt_timeout, opt_sleep)
+
+/**
+ * Set the default timeout for this retrier.
+ * @param {numer} timeout
+ */
+retry.setDefaultTimeout(timeout)
+
+/**
+ * Set the default sleep for this retrier.
+ * @param {numer} sleep
+ */
+retry.setDefaultSleep(sleep)
+
+/**
+ * Set the errors to be ignored. By default, all errors are ignored.
+ * The arguments may be either error classes or numbers, which correspond
+ * to error codes.
+ *
+ * For a list of webdriver error codes, see
+ * https://code.google.com/p/selenium/source/browse/javascript/atoms/error.js
+ *
+ * @param {...(number|Object)} varArgs a list of error codes or error
+ *     classes to be ignored
+ */
+retry.ignoring(ErrorTypeA, ErrorTypeB, ...)
 ```
 
 In your test
+------------
 
 ```javascript
 var retry = require('webdriverjs-retry');
@@ -48,3 +77,5 @@ retry.run(function() {
 // continue with your test
 
 ```
+
+See a [full example](https://github.com/juliemr/webdriverjs-retry/blob/master/example_test.js).
