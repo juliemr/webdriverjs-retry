@@ -3,11 +3,12 @@ var util = require('util'),
     chrome = require('selenium-webdriver/chrome'),
     retry = require('./index.js');
 
+// Assumes that there is a chromedriver binary in the same directory.
 var driver = chrome.createDriver(
     new webdriver.Capabilities({'browserName': 'chrome'}),
     new chrome.ServiceBuilder('./chromedriver').build());
 
-driver.get('localhost:8888');
+driver.get('http://juliemr.github.io/webdriverjs-retry/');
 
 retry.run(function() {
   // Note that everything in here will be retried - including the
