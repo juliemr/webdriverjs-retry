@@ -11,7 +11,7 @@
   ],
   "author": "Julie Ralph <ju.ralph@gmail.com>",
   "peerDependencies": {
-    "selenium-webdriver": "2.40.0"
+    "selenium-webdriver": ">= 2.40.0"
   },
   "devDependencies": {
     "minijasminenode": "~0.2.7"
